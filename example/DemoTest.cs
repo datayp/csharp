@@ -10,7 +10,7 @@ namespace DemoTest
         private String serverRoot = "https://www.mobpex.com/yop-center";//Mobpex对外提供的接口地址
         private String appId = "16031706093671048936";//企业在Mobpex注册的应用ID；
         private String userId = "changkun.deng@datayp.com";//用户id
-        private string secretKey = "LS_1biokjnAFBWqV8h1242collm9fvaq9l";//密钥值 
+        private string secretKey = "密钥";//密钥值 
                                                                         // private String serverRoot = "https://220.181.25.235/yop-center";
                                                                         // private String secretKey = "LS_1bilscsAFBWqFnc3f61ssiors7qira";
                                                                         // private String appId = "15122404366710489367";
