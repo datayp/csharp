@@ -21,14 +21,12 @@ namespace Mobpex1
         private int _timeout = 200000;
         private int _readWriteTimeout = 600000;
         private bool _ignoreSSLCheck = true;
-        private string secretKey = "LS_1biokjnAFBWqV8h1242collm9fvaq9l";
-        /*  private string secretKey = "LS_1biokjnAFBWqV8h1242collm9fvaq9l";
-
-          public string SecretKey
-          {
-              get { return this.secretKey; }
-              set { this.secretKey = value; }
-          }*/
+        private string secretKey;
+        public string SecretKey
+        {
+            get { return this.secretKey; }
+            set { this.secretKey = value; }
+        }
         /// <summary>
         /// 等待请求开始返回的超时时间
         /// </summary>
@@ -80,38 +78,6 @@ namespace Mobpex1
             System.IO.Stream reqStream = req.GetRequestStream();
             reqStream.Write(postData, 0, postData.Length);
             reqStream.Close();
-
-            HttpWebResponse rsp = (HttpWebResponse)req.GetResponse();
-            Encoding encoding = GetResponseEncoding(rsp);
-            return GetResponseAsString(rsp, encoding);
-        }
-
-        /// <summary>
-        /// 执行HTTP GET请求。
-        /// </summary>
-        /// <param name="url">请求地址</param>
-        /// <param name="textParams">请求文本参数</param>
-        /// <returns>HTTP响应</returns>
-        public string DoGet(string url, IDictionary<string, string> textParams)
-        {
-            return DoGet(url, textParams, null);
-        }
-        /// <summary>
-        /// 执行HTTP GET请求。
-        /// </summary>
-        /// <param name="url">请求地址</param>
-        /// <param name="textParams">请求文本参数</param>
-        /// <param name="headerParams">请求头部参数</param>
-        /// <returns>HTTP响应</returns>
-        public string DoGet(string url, IDictionary<string, string> textParams, IDictionary<string, string> headerParams)
-        {
-            if (textParams != null && textParams.Count > 0)
-            {
-                url = BuildRequestUrl(url, textParams);
-            }
-
-            HttpWebRequest req = GetWebRequest(url, "GET", headerParams);
-            req.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
 
             HttpWebResponse rsp = (HttpWebResponse)req.GetResponse();
             Encoding encoding = GetResponseEncoding(rsp);
@@ -336,17 +302,19 @@ namespace Mobpex1
             MD5Hashing md5 = new MD5Hashing();
             return md5.HashString(query.ToString());
         }
+        //签名验证
         public bool CheckSign(string jsonStr)
         {
-            if (null == jsonStr&& jsonStr.Length <=0)
+            if (null == jsonStr && jsonStr.Length <= 0)
             {
                 return false;
             }
             JObject jo = JObject.Parse(jsonStr);
             var result = "";
-            if (jo.Property("result") != null) { 
-             object resultTemp = jo["result"];        
-             result = JsonConvert.SerializeObject(resultTemp).Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\\", "");
+            if (jo.Property("result") != null)
+            {
+                object resultTemp = jo["result"];
+                result = JsonConvert.SerializeObject(resultTemp).Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\\", "");
             }
             string status = jo["state"].ToString();
             string ts = jo["ts"].ToString();
@@ -355,9 +323,9 @@ namespace Mobpex1
             {
                 ext = JsonConvert.SerializeObject(jo["ext"]).Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
             }
-            string  resultStr = secretKey + status + result +ts+ ext + secretKey;
-            string  signString = new MD5Hashing().HashString(resultStr);
-            string  sign = jo["sign"].ToString();
+            string resultStr = secretKey + status + result + ts + ext + secretKey;
+            string signString = new MD5Hashing().HashString(resultStr);
+            string sign = jo["sign"].ToString();
             if (signString.Equals(sign))
             {
                 return true;
